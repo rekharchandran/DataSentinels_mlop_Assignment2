@@ -1,3 +1,4 @@
+import joblib
 import pandas as pd
 import re
 import mlflow
@@ -10,9 +11,10 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.model_selection import GridSearchCV
 
+mlflow.set_experiment("Email Spam Detection")
 
 # Load your data (ensure this path is correct)
-df = pd.read_csv("/Users/sarath/Desktop/Mlop2/train.csv")
+df = pd.read_csv("train.csv")
 
 # Data Preprocessing: Clean text, split columns, etc.
 df = df[['sms', 'label']]  # Select relevant columns
@@ -106,3 +108,16 @@ with mlflow.start_run():
     with open("classification_report.txt", "w") as f:
         f.write(report)
     mlflow.log_artifact("classification_report.txt")
+
+    # Save the trained model and vectorizer to disk for inference
+    model_filename = "spam_classifier_model.pkl"
+    vectorizer_filename = "tfidf_vectorizer.pkl"
+    
+    joblib.dump(best_model, model_filename)
+    joblib.dump(vectorizer, vectorizer_filename)
+    
+    # Log the saved model and vectorizer as artifacts
+    mlflow.log_artifact(model_filename)
+    mlflow.log_artifact(vectorizer_filename)
+    
+    print("Model and vectorizer saved for inference.")

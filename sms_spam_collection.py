@@ -10,7 +10,7 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
 # Read the large CSV file
-df = pd.read_csv("/Users/sarath/Desktop/Mlop2/train.csv")
+df = pd.read_csv("train.csv")
 
 # If 'Unnamed: 0' column exists (index column), drop it
 if 'Unnamed: 0' in df.columns:
