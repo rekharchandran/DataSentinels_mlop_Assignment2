@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email/SMS Spam Detection</title>
+    <!-- Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            padding-top: 30px;
+        }
+        .container {
+            max-width: 1000px;
+        }
+        .heading {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .description {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .column-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: .5rem;
+            background-color: #ffffff;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            resize: vertical;
+            padding: 15px;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            margin-bottom: 10px;
+        }
+        .btn-api {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .result {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="heading">Email/SMS Spam Detection</div>
+        <div class="description">
+            Our web app uses advanced NLP techniques to determine if an email or SMS is spam.
+        </div>
+        <div class="row">
+            <!-- Column 1: Get Best Model Parameters -->
+            <div class="col-md-4">
+                <div class="column-section">
+                    <h4>Best Model Parameters</h4>
+                    <button id="get-params" class="btn btn-info btn-api">Get Best Model Parameters</button>
+                    <div id="params-result" class="result"></div>
+                </div>
+            </div>
+            <!-- Column 2: Detect Spam -->
+            <div class="col-md-4">
+                <div class="column-section">
+                    <h4>Detect Spam</h4>
+                    <form id="predict-form">
+                        <textarea name="message" id="message" placeholder="Type your email or SMS message here..." required></textarea>
+                        <button type="submit" class="btn btn-primary btn-api">Detect Spam</button>
+                    </form>
+                    <div id="prediction-result" class="result"></div>
+                </div>
+            </div>
+            <!-- Column 3: Retrain Model -->
+            <div class="col-md-4">
+                <div class="column-section">
+                    <h4>Retrain Model</h4>
+                    <button id="retrain-model" class="btn btn-warning btn-api">Retrain Model</button>
+                    <div id="training-result" class="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        // Handle prediction form submission
+        $("#predict-form").submit(function(event) {
+            event.preventDefault();
+            var message = $("#message").val();
+            $.ajax({
+                url: "/prediction",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({message: message}),
+                success: function(response) {
+                    $("#prediction-result").html("Prediction: " + response.prediction);
+                },
+                error: function(xhr) {
+                    $("#prediction-result").html("Error: " + xhr.responseJSON.error);
+                }
+            });
+        });
+
+        // Handle best model parameter button click
+        $("#get-params").click(function() {
+            $.ajax({
+                url: "/best_model_parameter",
+                method: "GET",
+                success: function(response) {
+                    var paramsHtml = "<pre>" + JSON.stringify(response, null, 2) + "</pre>";
+                    $("#params-result").html(paramsHtml);
+                },
+                error: function(xhr) {
+                    $("#params-result").html("Error: " + xhr.responseJSON.error);
+                }
+            });
+        });
+
+        // Handle retrain model button click
+        $("#retrain-model").click(function() {
+            $.ajax({
+                url: "/training",
+                method: "POST",
+                success: function(response) {
+                    var resultHtml = "Training Completed. New Parameters: <pre>" + JSON.stringify(response.best_params, null, 2) + "</pre>";
+                    $("#training-result").html(resultHtml);
+                },
+                error: function(xhr) {
+                    $("#training-result").html("Error: " + xhr.responseJSON.error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
